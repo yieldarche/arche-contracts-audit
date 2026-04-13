@@ -1,0 +1,53 @@
+{
+  "version": "1.0",
+  "chainId": "1",
+  "createdAt": 1776009600,
+  "meta": {
+    "name": "Arche / arUSD Handoff to Safe",
+    "description": "Three-call batch: (1) Safe accepts role_manager on vault, (2) Safe accepts feeManager on accountant, (3) Safe revokes deployer's operational roles. After this tx confirms, the deployer EOA has zero power over Arche.",
+    "txBuilderVersion": "1.16.5",
+    "createdFromSafeAddress": "0x3207bFbCa46D1D6316ef92F71e44B5C069d71886",
+    "createdFromOwnerAddress": ""
+  },
+  "transactions": [
+    {
+      "to": "0x33FfC177A7278FF84aaB314A036bC7b799B7Cc15",
+      "value": "0",
+      "data": "0xf776bf1f",
+      "contractMethod": {
+        "inputs": [],
+        "name": "accept_role_manager",
+        "payable": false
+      },
+      "contractInputsValues": null
+    },
+    {
+      "to": "0x462f89759f6ddcbdb39EE563576FfDdA3399716c",
+      "value": "0",
+      "data": "0xf94c53c7",
+      "contractMethod": {
+        "inputs": [],
+        "name": "acceptFeeManager",
+        "payable": false
+      },
+      "contractInputsValues": null
+    },
+    {
+      "to": "0x33FfC177A7278FF84aaB314A036bC7b799B7Cc15",
+      "value": "0",
+      "data": "0x2cf7fd850000000000000000000000000139f765e8895bca388605fb7b635a5adb510d650000000000000000000000000000000000000000000000000000000000000000",
+      "contractMethod": {
+        "inputs": [
+          { "internalType": "address", "name": "account", "type": "address" },
+          { "internalType": "uint256", "name": "role", "type": "uint256" }
+        ],
+        "name": "set_role",
+        "payable": false
+      },
+      "contractInputsValues": {
+        "account": "0x0139f765E8895BcA388605Fb7b635a5ADb510D65",
+        "role": "0"
+      }
+    }
+  ]
+}

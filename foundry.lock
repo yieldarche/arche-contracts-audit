@@ -1,0 +1,20 @@
+{
+  "lib/forge-std": {
+    "tag": {
+      "name": "v1.15.0",
+      "rev": "0844d7e1fc5e60d77b68e469bff60265f236c398"
+    }
+  },
+  "lib/vault-periphery": {
+    "tag": {
+      "name": "v3.0.1",
+      "rev": "06684958dc81d572fa8213c44bf96da14943402f"
+    }
+  },
+  "lib/yearn-vaults-v3": {
+    "tag": {
+      "name": "v3.0.4",
+      "rev": "104a2b233bc6d43ba40720d68355b04d2dc31795"
+    }
+  }
+}
