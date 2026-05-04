@@ -28,30 +28,33 @@ deployed by Arche; it is Yearn's existing V3 vault implementation:
 
 `0xd8063123BBA3B480569244AE66BFE72B6c84b00d`
 
-## Existing External Contracts
+## External And Arche Admin Addresses
 
-| Dependency | Address |
+| Address | Owner / role |
 | --- | --- |
-| USDC | `0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48` |
-| Yearn V3 VaultFactory | `0x770D0d1Fb036483Ed4AbB6d53c1C88fb277D812F` |
-| yvUSDC-1 strategy | `0xBe53A109B494E5c9f97b9Cd39Fe969BE68BF6204` |
-| Arche Safe | `0x3207bFbCa46D1D6316ef92F71e44B5C069d71886` |
-| Deployment EOA, now retired | `0x0139f765E8895BcA388605Fb7b635a5ADb510D65` |
+| `0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48` | USDC, external dependency |
+| `0x770D0d1Fb036483Ed4AbB6d53c1C88fb277D812F` | Yearn V3 VaultFactory, external dependency |
+| `0xBe53A109B494E5c9f97b9Cd39Fe969BE68BF6204` | yvUSDC-1 strategy, external Yearn dependency |
+| `0x3207bFbCa46D1D6316ef92F71e44B5C069d71886` | Arche Safe, current admin / role owner |
+| `0x0139f765E8895BcA388605Fb7b635a5ADb510D65` | Arche deployment EOA, now retired/revoked |
 
-## Fast Scope
+## Minimal Audit Scope
+
+| Path | Purpose |
+| --- | --- |
+| `audit-scope/source/HealthCheckAccountant.sol` | Source for deployed Accountant |
+| `audit-scope/source/VaultV3.vy` | Existing Yearn V3 implementation used by the arUSD vault clone |
+
+The deployment and handoff files are configuration/evidence, not additional
+deployed contract source:
 
 | Path | Purpose |
 | --- | --- |
 | `script/ArcheDeployBase.sol` | Shared deployment logic and production configuration |
 | `script/DeployArche.s.sol` | Mainnet deployment entrypoint |
-| `lib/vault-periphery/contracts/accountants/HealthCheckAccountant.sol` | Source for deployed Accountant |
-| `lib/yearn-vaults-v3/contracts/VaultV3.vy` | Yearn V3 vault implementation used by arUSD clone |
-| `lib/yearn-vaults-v3/contracts/VaultFactory.vy` | Factory that created the arUSD vault clone |
 | `broadcast/DeployArche.s.sol/1/run-latest.json` | Actual mainnet broadcast artifact |
 | `handoff/arche-handoff.json` | Safe batch that accepts ownership roles and retires the deployer |
 | `test/ArcheFork.t.sol` | Mainnet-fork deployment and lifecycle tests |
-| `foundry.toml` / `remappings.txt` / `foundry.lock` | Build configuration |
-| `.gitmodules` | Pinned upstream dependency repositories |
 
 ## Upstream Dependency Pins
 
@@ -63,12 +66,11 @@ The deployed vault and accountant rely on pinned upstream code:
 | `lib/vault-periphery` | `06684958dc81d572fa8213c44bf96da14943402f` (`v3.0.1`) |
 | `lib/forge-std` | `0844d7e1fc5e60d77b68e469bff60265f236c398` (`v1.15.0`) |
 
-Important upstream source files:
+Reference files, not requested for LOC count unless a full Yearn re-audit is
+separately requested:
 
 - `lib/yearn-vaults-v3/contracts/VaultFactory.vy`
-- `lib/yearn-vaults-v3/contracts/VaultV3.vy`
 - `lib/yearn-vaults-v3/contracts/interfaces/IVault.sol`
-- `lib/vault-periphery/contracts/accountants/HealthCheckAccountant.sol`
 - `lib/vault-periphery/contracts/libraries/Roles.sol`
 
 ## Configuration
@@ -91,8 +93,8 @@ The deployed vault:
 Clone with submodules:
 
 ```sh
-git clone --recurse-submodules https://github.com/yieldarche/arche-contracts.git
-cd arche-contracts
+git clone --recurse-submodules https://github.com/yieldarche/arche-contracts-audit.git
+cd arche-contracts-audit
 ```
 
 Run the mainnet-fork tests:
