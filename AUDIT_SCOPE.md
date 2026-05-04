@@ -1,137 +1,48 @@
 # Arche Audit Scope
 
-This document is the canonical scoping note for the Arche / arUSD Ethereum
-mainnet deployment.
+Audit these two deployed targets:
 
-Arche does not have a custom vault implementation contract in `src/`. The
-deployment creates:
-
-1. an arUSD Yearn V3 vault clone through Yearn's canonical VaultFactory, and
-2. a HealthCheckAccountant from Yearn vault-periphery.
-
-The requested audit scope is intentionally narrow: review the two deployed
-contract addresses and Arche's deployment/configuration that wired them
-together. Do not count the entire Yearn submodules as audit LOC unless a full
-Yearn re-audit is separately requested.
-
-For browser review on GitHub, `audit-scope/source/` contains only the two
-deployed contract source targets. For local review, the canonical `lib/...`
-submodule paths resolve after cloning with `--recurse-submodules`.
-
-## Deployed Contracts
-
-| Name | Address | How it was deployed | Canonical source |
-| --- | --- | --- | --- |
-| arUSD vault / token | `0x33FfC177A7278FF84aaB314A036bC7b799B7Cc15` | `CREATE2` clone created by Yearn `VaultFactory` | `lib/yearn-vaults-v3/contracts/VaultV3.vy` |
-| HealthCheckAccountant | `0x462f89759f6ddcbdb39EE563576FfDdA3399716c` | Direct `CREATE` from deployment script | `lib/vault-periphery/contracts/accountants/HealthCheckAccountant.sol` |
-
-The arUSD vault implementation was not deployed by Arche. The clone points to
-Yearn's existing V3 vault implementation:
-
-`0xd8063123BBA3B480569244AE66BFE72B6c84b00d`
-
-The factory used to create the vault clone:
-
-`0x770D0d1Fb036483Ed4AbB6d53c1C88fb277D812F`
-
-The broadcast artifact that proves the deployment and setup sequence is:
-
-`broadcast/DeployArche.s.sol/1/run-latest.json`
-
-## Requested Minimal Scope
-
-### Deployed contract source
-
-| File | Why it matters |
-| --- | --- |
-| `audit-scope/source/HealthCheckAccountant.sol` | Source for deployed Accountant |
-| `audit-scope/source/VaultV3.vy` | Existing Yearn V3 implementation used by the arUSD vault clone |
-
-Canonical local paths after cloning with submodules:
-
-| File | Why it matters |
-| --- | --- |
-| `lib/vault-periphery/contracts/accountants/HealthCheckAccountant.sol` | Runtime source for the deployed Accountant |
-| `lib/yearn-vaults-v3/contracts/VaultV3.vy` | Runtime implementation used by the arUSD vault clone |
-
-### Arche deployment/configuration evidence
-
-| File | Why it matters |
-| --- | --- |
-| `script/ArcheDeployBase.sol` | Core deployment/configuration logic: deploys accountant, calls Yearn factory, sets vault roles, adds yvUSDC-1 strategy, sets limits, starts Safe handoff |
-| `script/DeployArche.s.sol` | Mainnet deployment entrypoint and environment assumptions |
-| `broadcast/DeployArche.s.sol/1/run-latest.json` | Exact mainnet transaction sequence and constructor arguments |
-| `handoff/arche-handoff.json` | Safe batch to accept role manager, accept fee manager, and revoke deployer roles |
-| `test/ArcheFork.t.sol` | Mainnet-fork tests covering deployment and lifecycle behavior |
-
-## Reference Only / Not Requested For LOC Count
-
-These files are included so auditors can trace dependencies, but they are not
-part of the requested minimal LOC count unless the audit firm explicitly wants
-to re-review Yearn internals:
-
-| File | Reference purpose |
-| --- | --- |
-| `lib/yearn-vaults-v3/contracts/VaultFactory.vy` | Factory that created the arUSD clone |
-| `lib/yearn-vaults-v3/contracts/interfaces/IVault.sol` | Interface used by scripts/tests |
-| `lib/vault-periphery/contracts/libraries/Roles.sol` | Yearn role constants |
-| `lib/yearn-vaults-v3/` | Pinned upstream Yearn V3 dependency |
-| `lib/vault-periphery/` | Pinned upstream Yearn periphery dependency |
-
-## External Contracts And Dependencies
-
-These addresses are existing external dependencies, not custom Arche contracts:
-
-| Dependency | Address | Scope note |
+| Target | Address | Source |
 | --- | --- | --- |
-| USDC | `0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48` | Existing asset token |
-| yvUSDC-1 strategy | `0xBe53A109B494E5c9f97b9Cd39Fe969BE68BF6204` | Existing Yearn ERC-4626 vault used as Arche's first strategy |
-| Arche Safe | `0x3207bFbCa46D1D6316ef92F71e44B5C069d71886` | Long-term role manager / fee manager / fee recipient |
-| Deployment EOA | `0x0139f765E8895BcA388605Fb7b635a5ADb510D65` | Temporary deployer, revoked by Safe handoff |
+| arUSD vault / token | `0x33FfC177A7278FF84aaB314A036bC7b799B7Cc15` | `audit-scope/source/VaultV3.vy` |
+| HealthCheckAccountant | `0x462f89759f6ddcbdb39EE563576FfDdA3399716c` | `audit-scope/source/HealthCheckAccountant.sol` |
 
-## Configuration To Verify
+## Yearn Linkage
 
-| Setting | Value |
+arUSD is a Yearn V3 vault clone. Arche did not deploy a custom vault
+implementation.
+
+| Component | Address / path |
 | --- | --- |
-| Asset | USDC |
-| Vault name | `Arche USD` |
-| Vault symbol | `arUSD` |
-| Decimals | `6` |
-| Profit max unlock time | `864000` seconds |
-| Deposit limit | `50,000,000 USDC` |
-| First strategy | yvUSDC-1 |
-| Arche management fee | `0` |
-| Arche performance fee | `0` |
-| Safe role bitmask | `16383` |
-| Accountant max fee | `10000` bps |
-| Accountant max gain | `20000` bps |
-| Accountant max loss | `1` bps |
+| arUSD clone | `0x33FfC177A7278FF84aaB314A036bC7b799B7Cc15` |
+| Yearn VaultV3 implementation | `0xd8063123BBA3B480569244AE66BFE72B6c84b00d` |
+| Yearn VaultFactory | `0x770D0d1Fb036483Ed4AbB6d53c1C88fb277D812F` |
+| VaultV3 source | `audit-scope/source/VaultV3.vy` |
+| yvUSDC-1 first strategy | `0xBe53A109B494E5c9f97b9Cd39Fe969BE68BF6204` |
 
-## Explicitly Out Of Scope
+The Accountant source is from the pinned Yearn vault-periphery submodule:
 
-- There is no custom Arche strategy contract in this release.
-- Arche did not deploy a custom vault implementation.
-- The initial strategy is the existing Yearn yvUSDC-1 vault.
-- A full re-audit of the entire Yearn V3 codebase is not requested in this
-  minimal Arche scope.
-- Future Arche strategies should be scoped and reviewed separately before they
-  are added by the Safe.
+`audit-scope/source/HealthCheckAccountant.sol`
 
-## Verify Locally
+## Arche Files To Review
 
-Clone with submodules:
+| File | Purpose |
+| --- | --- |
+| `script/ArcheDeployBase.sol` | Deployment/configuration logic |
+| `script/DeployArche.s.sol` | Mainnet deployment entrypoint |
+| `broadcast/DeployArche.s.sol/1/run-latest.json` | Actual mainnet transaction artifact |
+| `handoff/arche-handoff.json` | Safe handoff batch |
+| `test/ArcheFork.t.sol` | Mainnet-fork tests |
 
-```sh
-git clone --recurse-submodules https://github.com/yieldarche/arche-contracts-audit.git
-cd arche-contracts-audit
-```
+## Admin Addresses
 
-Run the fork tests:
+| Address | Role |
+| --- | --- |
+| `0x3207bFbCa46D1D6316ef92F71e44B5C069d71886` | Arche Safe, current admin |
+| `0x0139f765E8895BcA388605Fb7b635a5ADb510D65` | Deployment EOA, retired/revoked |
 
-```sh
-forge test
-```
+## Out Of Scope
 
-If `ETH_RPC_URL` is not set, the tests fall back to:
-
-`https://ethereum-rpc.publicnode.com`
+- No custom Arche strategy was deployed.
+- No custom Arche vault implementation was deployed.
+- Full Yearn V3 re-audit is not requested unless scoped separately.
