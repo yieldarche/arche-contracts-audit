@@ -13,6 +13,10 @@ The `source/` directory contains symlinks to the exact in-scope source files:
 - `source/IVault.sol`
 - `source/Roles.sol`
 
+These shortcut files render on GitHub and point to the canonical source files
+in `script/` and pinned `lib/` submodules. For local review, clone with
+`--recurse-submodules` so every target resolves.
+
 ## Primary Files
 
 Review these first:

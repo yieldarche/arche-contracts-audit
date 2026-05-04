@@ -12,6 +12,10 @@ deployment creates:
 The important review work is the deployed address mapping, the pinned upstream
 source that backs those addresses, and the Arche deployment/configuration logic.
 
+For browser review on GitHub, use the shortcut files in
+`audit-scope/source/`. For local review, the canonical `lib/...` submodule
+paths resolve after cloning with `--recurse-submodules`.
+
 ## Deployed Contracts
 
 | Name | Address | How it was deployed | Canonical source |
@@ -45,6 +49,18 @@ The broadcast artifact that proves the deployment and setup sequence is:
 | `test/ArcheFork.t.sol` | Mainnet-fork tests covering deployment and lifecycle behavior |
 
 ### Pinned upstream source used by deployed contracts
+
+| File | Why it matters |
+| --- | --- |
+| `audit-scope/source/ArcheDeployBase.sol` | Shortcut to the core Arche deployment/configuration logic |
+| `audit-scope/source/DeployArche.s.sol` | Shortcut to the mainnet deployment entrypoint |
+| `audit-scope/source/HealthCheckAccountant.sol` | Shortcut to the deployed Accountant source |
+| `audit-scope/source/VaultV3.vy` | Shortcut to the arUSD vault implementation source |
+| `audit-scope/source/VaultFactory.vy` | Shortcut to the factory source used to create arUSD |
+| `audit-scope/source/IVault.sol` | Shortcut to the vault interface used by scripts/tests |
+| `audit-scope/source/Roles.sol` | Shortcut to Yearn role constants |
+
+Canonical local paths after cloning with submodules:
 
 | File | Why it matters |
 | --- | --- |
