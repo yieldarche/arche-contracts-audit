@@ -1,1 +1,0 @@
-../../lib/yearn-vaults-v3/contracts/VaultFactory.vy

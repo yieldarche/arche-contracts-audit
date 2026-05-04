@@ -9,12 +9,14 @@ deployment creates:
 1. an arUSD Yearn V3 vault clone through Yearn's canonical VaultFactory, and
 2. a HealthCheckAccountant from Yearn vault-periphery.
 
-The important review work is the deployed address mapping, the pinned upstream
-source that backs those addresses, and the Arche deployment/configuration logic.
+The requested audit scope is intentionally narrow: review the two deployed
+contract addresses and Arche's deployment/configuration that wired them
+together. Do not count the entire Yearn submodules as audit LOC unless a full
+Yearn re-audit is separately requested.
 
-For browser review on GitHub, use the shortcut files in
-`audit-scope/source/`. For local review, the canonical `lib/...` submodule
-paths resolve after cloning with `--recurse-submodules`.
+For browser review on GitHub, `audit-scope/source/` contains only the two
+deployed contract source targets. For local review, the canonical `lib/...`
+submodule paths resolve after cloning with `--recurse-submodules`.
 
 ## Deployed Contracts
 
@@ -36,39 +38,45 @@ The broadcast artifact that proves the deployment and setup sequence is:
 
 `broadcast/DeployArche.s.sol/1/run-latest.json`
 
-## Files In Scope
+## Requested Minimal Scope
 
-### Arche-authored deployment and configuration
-
-| File | Why it matters |
-| --- | --- |
-| `script/ArcheDeployBase.sol` | Core deployment/configuration logic: deploys accountant, calls Yearn factory, sets vault roles, adds yvUSDC-1 strategy, sets limits, starts Safe handoff |
-| `script/DeployArche.s.sol` | Mainnet deployment entrypoint and environment assumptions |
-| `handoff/arche-handoff.json` | Safe batch to accept role manager, accept fee manager, and revoke deployer roles |
-| `broadcast/DeployArche.s.sol/1/run-latest.json` | Exact mainnet transaction sequence and constructor arguments |
-| `test/ArcheFork.t.sol` | Mainnet-fork tests covering deployment and lifecycle behavior |
-
-### Pinned upstream source used by deployed contracts
+### Deployed contract source
 
 | File | Why it matters |
 | --- | --- |
-| `audit-scope/source/ArcheDeployBase.sol` | Shortcut to the core Arche deployment/configuration logic |
-| `audit-scope/source/DeployArche.s.sol` | Shortcut to the mainnet deployment entrypoint |
-| `audit-scope/source/HealthCheckAccountant.sol` | Shortcut to the deployed Accountant source |
-| `audit-scope/source/VaultV3.vy` | Shortcut to the arUSD vault implementation source |
-| `audit-scope/source/VaultFactory.vy` | Shortcut to the factory source used to create arUSD |
-| `audit-scope/source/IVault.sol` | Shortcut to the vault interface used by scripts/tests |
-| `audit-scope/source/Roles.sol` | Shortcut to Yearn role constants |
+| `audit-scope/source/HealthCheckAccountant.sol` | Source for deployed Accountant |
+| `audit-scope/source/VaultV3.vy` | Existing Yearn V3 implementation used by the arUSD vault clone |
 
 Canonical local paths after cloning with submodules:
 
 | File | Why it matters |
 | --- | --- |
-| `lib/yearn-vaults-v3/contracts/VaultV3.vy` | Runtime implementation used by the arUSD vault clone |
-| `lib/yearn-vaults-v3/contracts/VaultFactory.vy` | Factory called by the deployment script to create arUSD |
-| `lib/yearn-vaults-v3/contracts/interfaces/IVault.sol` | Interface used by the deployment script and tests |
 | `lib/vault-periphery/contracts/accountants/HealthCheckAccountant.sol` | Runtime source for the deployed Accountant |
-| `lib/vault-periphery/contracts/libraries/Roles.sol` | Role constants used by Yearn periphery/accountant/vault permissions |
+| `lib/yearn-vaults-v3/contracts/VaultV3.vy` | Runtime implementation used by the arUSD vault clone |
+
+### Arche deployment/configuration evidence
+
+| File | Why it matters |
+| --- | --- |
+| `script/ArcheDeployBase.sol` | Core deployment/configuration logic: deploys accountant, calls Yearn factory, sets vault roles, adds yvUSDC-1 strategy, sets limits, starts Safe handoff |
+| `script/DeployArche.s.sol` | Mainnet deployment entrypoint and environment assumptions |
+| `broadcast/DeployArche.s.sol/1/run-latest.json` | Exact mainnet transaction sequence and constructor arguments |
+| `handoff/arche-handoff.json` | Safe batch to accept role manager, accept fee manager, and revoke deployer roles |
+| `test/ArcheFork.t.sol` | Mainnet-fork tests covering deployment and lifecycle behavior |
+
+## Reference Only / Not Requested For LOC Count
+
+These files are included so auditors can trace dependencies, but they are not
+part of the requested minimal LOC count unless the audit firm explicitly wants
+to re-review Yearn internals:
+
+| File | Reference purpose |
+| --- | --- |
+| `lib/yearn-vaults-v3/contracts/VaultFactory.vy` | Factory that created the arUSD clone |
+| `lib/yearn-vaults-v3/contracts/interfaces/IVault.sol` | Interface used by scripts/tests |
+| `lib/vault-periphery/contracts/libraries/Roles.sol` | Yearn role constants |
+| `lib/yearn-vaults-v3/` | Pinned upstream Yearn V3 dependency |
+| `lib/vault-periphery/` | Pinned upstream Yearn periphery dependency |
 
 ## External Contracts And Dependencies
 
@@ -104,6 +112,8 @@ These addresses are existing external dependencies, not custom Arche contracts:
 - There is no custom Arche strategy contract in this release.
 - Arche did not deploy a custom vault implementation.
 - The initial strategy is the existing Yearn yvUSDC-1 vault.
+- A full re-audit of the entire Yearn V3 codebase is not requested in this
+  minimal Arche scope.
 - Future Arche strategies should be scoped and reviewed separately before they
   are added by the Safe.
 

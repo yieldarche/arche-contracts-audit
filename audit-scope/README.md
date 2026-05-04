@@ -1,20 +1,17 @@
 # Audit Scope File Index
 
-This directory is an auditor-facing index. It keeps the files to review in one
-place without duplicating source code from the pinned submodules.
+This directory is an auditor-facing index. It keeps the minimal deployed
+contract source targets easy to find without duplicating source code from the
+pinned submodules.
 
-The `source/` directory contains symlinks to the exact in-scope source files:
+The `source/` directory contains symlinks to the two deployed contract source
+targets:
 
-- `source/ArcheDeployBase.sol`
-- `source/DeployArche.s.sol`
 - `source/HealthCheckAccountant.sol`
 - `source/VaultV3.vy`
-- `source/VaultFactory.vy`
-- `source/IVault.sol`
-- `source/Roles.sol`
 
-These shortcut files render on GitHub and point to the canonical source files
-in `script/` and pinned `lib/` submodules. For local review, clone with
+These shortcut files render on GitHub and point to canonical source files in
+pinned `lib/` submodules. For local review, clone with
 `--recurse-submodules` so every target resolves.
 
 ## Primary Files
@@ -24,13 +21,10 @@ Review these first:
 | File | Role |
 | --- | --- |
 | `../AUDIT_SCOPE.md` | Full scope, deployed addresses, and out-of-scope notes |
+| `source/HealthCheckAccountant.sol` | Source for deployed Accountant |
+| `source/VaultV3.vy` | Existing Yearn V3 implementation used by arUSD clone |
 | `../script/ArcheDeployBase.sol` | Core Arche deployment/configuration logic |
 | `../script/DeployArche.s.sol` | Mainnet deployment entrypoint |
-| `../lib/vault-periphery/contracts/accountants/HealthCheckAccountant.sol` | Source for deployed Accountant |
-| `../lib/yearn-vaults-v3/contracts/VaultV3.vy` | Runtime implementation used by arUSD clone |
-| `../lib/yearn-vaults-v3/contracts/VaultFactory.vy` | Factory used to create arUSD clone |
-| `../lib/yearn-vaults-v3/contracts/interfaces/IVault.sol` | Vault interface used by scripts/tests |
-| `../lib/vault-periphery/contracts/libraries/Roles.sol` | Role constants used by Yearn permissions |
 
 ## Deployment Evidence
 
@@ -45,3 +39,6 @@ Review these first:
 There are no custom Arche implementation contracts under `src/`. That is
 intentional: the deployed arUSD vault is a Yearn V3 clone, and the Accountant
 comes from the pinned Yearn vault-periphery submodule.
+
+The whole Yearn submodule tree is present for reproducibility, not because the
+minimal Arche scope asks auditors to count every Yearn file as audit LOC.

@@ -1,1 +1,0 @@
-../../lib/vault-periphery/contracts/libraries/Roles.sol

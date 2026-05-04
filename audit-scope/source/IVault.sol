@@ -1,1 +1,0 @@
-../../lib/yearn-vaults-v3/contracts/interfaces/IVault.sol
