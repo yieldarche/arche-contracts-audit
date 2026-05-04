@@ -2,9 +2,17 @@
 
 Audit repository for the Arche / arUSD Ethereum mainnet deployment.
 
-This repo contains the production deployment scripts, broadcast artifacts,
-handoff transaction, fork tests, and pinned upstream dependencies needed to
-review the deployed Arche contracts.
+Start here:
+
+- [AUDIT_SCOPE.md](./AUDIT_SCOPE.md) gives the exact deployed addresses,
+  source files, configuration, and out-of-scope dependencies.
+- [audit-scope/README.md](./audit-scope/README.md) is a short file index for
+  auditors who just want the paths to review.
+
+This repo is intentionally not laid out like a normal protocol with custom
+contracts under `src/`. Arche deployed a Yearn V3 vault clone plus a
+HealthCheckAccountant, using pinned upstream Yearn source and Arche deployment
+configuration.
 
 ## Deployment Summary
 
@@ -30,12 +38,15 @@ deployed by Arche; it is Yearn's existing V3 vault implementation:
 | Arche Safe | `0x3207bFbCa46D1D6316ef92F71e44B5C069d71886` |
 | Deployment EOA, now retired | `0x0139f765E8895BcA388605Fb7b635a5ADb510D65` |
 
-## Files For Review
+## Fast Scope
 
 | Path | Purpose |
 | --- | --- |
 | `script/ArcheDeployBase.sol` | Shared deployment logic and production configuration |
 | `script/DeployArche.s.sol` | Mainnet deployment entrypoint |
+| `lib/vault-periphery/contracts/accountants/HealthCheckAccountant.sol` | Source for deployed Accountant |
+| `lib/yearn-vaults-v3/contracts/VaultV3.vy` | Yearn V3 vault implementation used by arUSD clone |
+| `lib/yearn-vaults-v3/contracts/VaultFactory.vy` | Factory that created the arUSD vault clone |
 | `broadcast/DeployArche.s.sol/1/run-latest.json` | Actual mainnet broadcast artifact |
 | `handoff/arche-handoff.json` | Safe batch that accepts ownership roles and retires the deployer |
 | `test/ArcheFork.t.sol` | Mainnet-fork deployment and lifecycle tests |

@@ -1,0 +1,1 @@
+../../lib/yearn-vaults-v3/contracts/VaultV3.vy
